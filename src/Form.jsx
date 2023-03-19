@@ -189,11 +189,11 @@ function Form() {
           </div>
           <div>
             {paymentHistory.length > 0 && (
-              <h4>Total Principal Paid ${calculateMinPrincipal(principal)} per month.</h4>
+              <h4>Total Principal Paid ${calculateMinPrincipal(principal)} for the entire loan.</h4>
             )}
             {paymentHistory.length > 0 && (
               <h4>
-                Total Interest Paid ${calculateInterest(interest)} per month.
+                Total Interest Paid ${calculateInterest(interest)} for the entire loan.
               </h4>
             )}
           </div>
