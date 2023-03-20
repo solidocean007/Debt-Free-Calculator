@@ -15,14 +15,15 @@ function Form() {
   const [paymentHistory, setPaymentHistory] = useState([]);
 
   //Retrieve principal and interest rate
-  const getPrincipalAndInterestRate = () => {
+  const getInputs = () => {
+    const userPayment = parseFloat(inputs.makePayment);
     const principal = parseFloat(inputs.totalDebt);
     const interestRate = parseFloat(inputs.interestRate) / 100;
-    return { principal, interestRate};
+    return { userPayment, principal, interestRate};
   }
 
   useEffect(() => {
-    const { principal, interestRate } = getPrincipalAndInterestRate();
+    const { principal, interestRate } = getInputs();
     updateMinimumDue(principal, interestRate);
   }, [inputs.totalDebt, inputs.interestRate]);
 
@@ -77,7 +78,7 @@ function Form() {
     const userPayment = parseFloat(inputs.makePayment) || 0;
 
     // Retrieve principal and interestRate
-    const { principal, interestRate } = getPrincipalAndInterestRate();
+    const { principal, interestRate } = getInputs();
 
     if (userPayment < inputs.due) {
       setAlertMessage(
@@ -93,9 +94,7 @@ function Form() {
 
   // Calculate payments remaining
   const calculatePaymentsRemaining = () => {
-    const principal = parseFloat(inputs.totalDebt) || 0;
-    const userPayment = parseFloat(inputs.makePayment) || 0;
-    const interestRate = parseFloat(inputs.interestRate) / 100 || 0;
+    const { userPayment, principal, interestRate } = getInputs();
   
     if (userPayment <= 0) {
       return "N/A";
@@ -162,7 +161,7 @@ function Form() {
 
             {/* Make a payment field */}
             <label htmlFor="makePayment">Make a payment</label>
-            <p>Minimum payment is: ${inputs.due}</p>
+            <p>Minimum payment is: ${inputs.due.toFixed(2)}</p>
             <br />
             <input
               className="numInput"
@@ -170,7 +169,7 @@ function Form() {
               type="number"
               id="makePayment"
               value={inputs.makePayment || ''}
-              placeholder={inputs.due}
+              placeholder={inputs.due.toFixed(2)}
               onChange={handleChange}
             />
             <br />
@@ -182,9 +181,9 @@ function Form() {
         {/* Loan details */}
         <div className="loanDetails">
           <h3>Monthly Payments</h3>
-          <h1>${inputs.due}</h1>
+          <h1>${inputs.due.toFixed(2)}</h1>
           <div>
-            <h4>Interest is: ${interest.toFixed(2)} per month.</h4>
+            <h4>Interest : ${interest.toFixed(2)} per month.</h4>
             <h4>Minimum principal is: ${calculateMinPrincipal(principal)} per month.</h4>
           </div>
           <div>
