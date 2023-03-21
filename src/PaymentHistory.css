@@ -1,0 +1,29 @@
+.paymentBlock {
+  margin-top: 1rem;
+  background-image: linear-gradient(to right,#FFFFFF, #6DD5FA , #2980B9);
+  border: none;
+}
+
+.paymentHistory h2 {
+  color: rgb(216, 237, 232);
+  letter-spacing: 2px;
+}
+
+.payment-table {
+  border: 1px solid black;
+  width: 100%;
+}
+
+.payment-table th,
+.payment-table td {
+  color: whitesmoke;
+  font-family: sans-serif;
+  font-weight: 500;
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+
+.payment-table th {
+  background-color: #f2f2f2;
+}
