@@ -8,7 +8,6 @@ function Form() {
     totalDebt: 0,
     interestRate: 0,
     makePayment: 0,
-    due: 0,
   });
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -22,10 +21,20 @@ function Form() {
     return { userPayment, principal, interestRate };
   };
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const { principal, interestRate } = getInputs();
+  //   updateMinimumDue(principal, interestRate);
+  // }, [inputs.totalDebt, inputs.interestRate]);
+
+  // Calculate the minimum due based on the current input values
+  const calculateMinimumDue = () => {
     const { principal, interestRate } = getInputs();
-    updateMinimumDue(principal, interestRate);
-  }, [inputs.totalDebt, inputs.interestRate]);
+    const minPrincipal = calculateMinPrincipal(principal);
+    const interest = calculateInterest(principal, interestRate);
+    const due =
+      principal <= 100 ? principal * 1.01 : parseFloat(minPrincipal) + interest;
+    return due;
+  };
 
   const closeAlert = () => {
     setShowAlert(false);
@@ -69,7 +78,9 @@ function Form() {
         remainingBalance: newBalance,
       },
     ]);
-    updateMinimumDue();
+    // updateMinimumDue();
+    const newDue = calculateMinimumDue();
+    setInputs((values) => ({ ...values, due: newDue }));
   };
 
   const handleSubmit = (event) => {
@@ -79,13 +90,14 @@ function Form() {
     // Retrieve principal and interestRate
     const { principal, interestRate } = getInputs();
 
-    if (userPayment < inputs.due) {
+    if (userPayment < calculateMinimumDue()) {
       setAlertMessage(
         "Please enter an amount equal to or greater than the minimum due."
       );
       setShowAlert(true);
     } else {
       processPayment(userPayment, principal, interestRate);
+      updateMinimumDue(principal, interestRate);
     }
   };
 
@@ -171,7 +183,7 @@ function Form() {
             {/* Make a payment field */}
             <div className="entry">
               <label htmlFor="makePayment">Make a payment</label>
-              <p>Minimum payment is: ${inputs.due.toFixed(2)}</p>
+              <p>Minimum payment is: ${calculateMinimumDue().toFixed(2)}</p>
 
               <input
                 className="numInput"
@@ -179,7 +191,7 @@ function Form() {
                 type="number"
                 id="makePayment"
                 value={inputs.makePayment || ""}
-                placeholder={inputs.due.toFixed(2)}
+                placeholder={calculateMinimumDue().toFixed(2)}
                 onChange={handleChange}
               />
 
@@ -191,7 +203,7 @@ function Form() {
         {/* Loan details */}
         <div className="loanDetails">
           <h3>Monthly Payments</h3>
-          <h1>${inputs.due.toFixed(2)}</h1>
+          <h1>${calculateMinimumDue().toFixed(2)}</h1>
           <div>
             <h4>
               Interest is: $
