@@ -4,6 +4,7 @@ import MinAlert from "./MinAlert";
 import PaymentHistory from "./PaymentHistory";
 
 function Form() {
+  // State hooks
   const [inputs, setInputs] = useState({
     totalDebt: 0,
     interestRate: 0,
@@ -13,74 +14,10 @@ function Form() {
   const [alertMessage, setAlertMessage] = useState("");
   const [paymentHistory, setPaymentHistory] = useState([]);
 
-  //Retrieve principal and interest rate
-  const getInputs = () => {
-    const userPayment = parseFloat(inputs.makePayment);
-    const principal = parseFloat(inputs.totalDebt);
-    const interestRate = parseFloat(inputs.interestRate) / 100;
-    return { userPayment, principal, interestRate };
-  };
-
-  // useEffect(() => {
-  //   const { principal, interestRate } = getInputs();
-  //   updateMinimumDue(principal, interestRate);
-  // }, [inputs.totalDebt, inputs.interestRate]);
-
-  // Calculate the minimum due based on the current input values
-  const calculateMinimumDue = () => {
-    const { principal, interestRate } = getInputs();
-    const minPrincipal = calculateMinPrincipal(principal);
-    const interest = calculateInterest(principal, interestRate);
-    const due =
-      principal <= 100 ? principal * 1.01 : parseFloat(minPrincipal) + interest;
-    return due;
-  };
-
-  const closeAlert = () => {
-    setShowAlert(false);
-  };
-
+  //Input functions
   const handleChange = (event) => {
     const { name, value } = event.target;
     setInputs((oldValues) => ({ ...oldValues, [name]: value }));
-  };
-
-  const calculateInterest = (principal, interestRate) => {
-    return (principal * interestRate) / 12;
-  };
-
-  const calculateMinPrincipal = (debt) => {
-    return (debt * 0.01).toFixed(2);
-  };
-
-  // Calculate the minimum due and add or update that value to state for tracking
-  const updateMinimumDue = (principal, interestRate) => {
-    const minPrincipal = calculateMinPrincipal(principal);
-    const interest = calculateInterest(principal, interestRate);
-    const due =
-      principal <= 100 ? principal * 1.01 : parseFloat(minPrincipal) + interest;
-    setInputs((values) => ({ ...values, due }));
-  };
-
-  //
-  const processPayment = (userPayment, principal, interestRate) => {
-    const interest = calculateInterest(principal, interestRate);
-    const principalPayment = userPayment - interest;
-    const newBalance = principal - principalPayment;
-
-    setInputs((values) => ({ ...values, totalDebt: newBalance }));
-    setPaymentHistory([
-      ...paymentHistory,
-      {
-        payment: userPayment,
-        principal: principalPayment,
-        interest: interest,
-        remainingBalance: newBalance,
-      },
-    ]);
-    // updateMinimumDue();
-    const newDue = calculateMinimumDue();
-    setInputs((values) => ({ ...values, due: newDue }));
   };
 
   const handleSubmit = (event) => {
@@ -101,7 +38,31 @@ function Form() {
     }
   };
 
-  // Calculate payments remaining
+  // Calculate functions
+  const getInputs = () => {
+    const userPayment = parseFloat(inputs.makePayment);
+    const principal = parseFloat(inputs.totalDebt);
+    const interestRate = parseFloat(inputs.interestRate) / 100;
+    return { userPayment, principal, interestRate };
+  };
+
+  const calculateInterest = (principal, interestRate) => {
+    return (principal * interestRate) / 12;
+  };
+
+  const calculateMinPrincipal = (debt) => {
+    return (debt * 0.01).toFixed(2);
+  };
+
+  const calculateMinimumDue = () => {
+    const { principal, interestRate } = getInputs();
+    const minPrincipal = calculateMinPrincipal(principal);
+    const interest = calculateInterest(principal, interestRate);
+    const due =
+      principal <= 100 ? principal * 1.01 : parseFloat(minPrincipal) + interest;
+    return due;
+  };
+
   const calculatePaymentsRemaining = () => {
     const { userPayment, principal, interestRate } = getInputs();
 
@@ -139,7 +100,34 @@ function Form() {
     );
   };
 
-  const { principal, interestRate, interest, userPayment } = getInputs();
+
+// State functions
+  const processPayment = (userPayment, principal, interestRate) => {
+    const interest = calculateInterest(principal, interestRate);
+    const principalPayment = userPayment - interest;
+    const newBalance = principal - principalPayment;
+
+    setInputs((values) => ({ ...values, totalDebt: newBalance }));
+    setPaymentHistory([
+      ...paymentHistory,
+      {
+        payment: userPayment,
+        principal: principalPayment,
+        interest: interest,
+        remainingBalance: newBalance,
+      },
+    ]);
+
+    const newDue = calculateMinimumDue();
+    setInputs((values) => ({ ...values, due: newDue }));
+  };
+
+  const closeAlert = () => {
+    setShowAlert(false);
+  };
+
+  // Retrieve total loan amount 
+  const { principal } = getInputs();
 
   return (
     <div className="Form">
@@ -156,7 +144,6 @@ function Form() {
                 name="totalDebt"
                 type="number"
                 step="0.01"
-                // value={inputs.totalDebt || ""}
                 id="totalDebt"
                 onChange={handleChange}
               />
